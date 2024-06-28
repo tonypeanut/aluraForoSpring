@@ -42,25 +42,34 @@ Uso
 Endpoints Principales
 
     Crear un nuevo tópico:
-        POST /api/topicos
-        Body: { "titulo": "Nuevo Tópico", "mensaje": "Contenido del tópico", "autor": "Usuario" }
+        POST /topicos
+        Body: { "titulo": "Nuevo Tópico", "mensaje": "Contenido del tópico", "autorId": "ID del Usuario", "cursoId": "ID del curso" }
 
     Mostrar todos los tópicos:
-        GET /api/topicos
+        GET /topicos
+        Parametros opcionales: "nombreCurso", "year"
+        Ejemplo: /topicos?nombreCurso=1&year=2024
 
     Mostrar un tópico específico:
-        GET /api/topicos/{id}
+        GET /topicos/{id}
 
     Actualizar un tópico:
-        PUT /api/topicos/{id}
+        PUT /topicos/{id}
         Body: { "titulo": "Título Actualizado", "mensaje": "Contenido Actualizado" }
 
     Eliminar un tópico:
-        DELETE /api/topicos/{id}
+        DELETE /topicos/{id}
+
+    Generar JWT token:
+        POST /login
+        Body: { "login": "Usuario", "clave": "Contraseña" }
 
 Autenticación
 
-Para acceder a algunos endpoints, es necesario estar autenticado. Implementa tu servicio de autenticación y autorización preferido.
+Para acceder a algunos endpoints, es necesario estar autenticado. En este desarrollo se utiliza JWT Token, y se tiene que enviar con cada solicitud. Para generar el JWT Token tienes que ingresar al endpoint "/login" con usuario y clave válidos. Para hacer pruebas genera un nuevo usuario en la base de datos y una contraseña hasheada con Bcrypt con 10 rondas 
+Implementa tu servicio de autenticación y autorización preferido.
+
+
 Contribuir
 
     Haz un fork del proyecto.
