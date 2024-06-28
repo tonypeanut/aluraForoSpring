@@ -17,8 +17,13 @@ public class TratadorDeErrores {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
-    @ExceptionHandler(TituloDuplicadoException.class)
-    public ResponseEntity<String> handleTituloDuplicadoException(TituloDuplicadoException ex){
+    @ExceptionHandler(TituloYMensajeDuplicadosException.class)
+    public ResponseEntity<String> handleTituloDuplicadoException(TituloYMensajeDuplicadosException ex){
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(IdNotFoundException.class)
+    public ResponseEntity<String> handleIdNotFoundException(IdNotFoundException ex){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 }

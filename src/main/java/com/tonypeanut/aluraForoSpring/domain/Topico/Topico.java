@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -21,6 +22,7 @@ public class Topico {
     private String titulo;
     private String mensaje;
     private LocalDateTime fechaCreacion;
+    private LocalDateTime fechaActualizacion;
     private String status;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "topicos_usuarios_id")
@@ -39,5 +41,22 @@ public class Topico {
         this.fechaCreacion = LocalDateTime.now();
         this.usuario = null;
         this.status = "Activo";
+    }
+
+    public void actualizar(DatosActualizarTopico datosActualizarTopico){
+        if(datosActualizarTopico.titulo()!=null){
+            this.titulo = datosActualizarTopico.titulo();
+        }
+
+        if(datosActualizarTopico.mensaje()!=null){
+            this.mensaje = datosActualizarTopico.mensaje();
+        }
+
+        this.fechaActualizacion = LocalDateTime.now();
+    }
+
+    public void desactivar(){
+        this.status = "Eliminado";
+        this.fechaActualizacion = LocalDateTime.now();
     }
 }
