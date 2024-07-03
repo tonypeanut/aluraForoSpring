@@ -23,4 +23,21 @@ public class Respuesta {
     @JoinColumn(name = "respuestas_usuarios_id")
     private Usuario usuario;
     private String solucion;
+    private String estado;
+
+    public Respuesta(){}
+
+    public Respuesta(
+            DatosRegistroRespuesta datos,
+            Topico topico,
+            Usuario usuario
+    ) {
+        this.mensaje = datos.mensaje();
+        this.topico = topico;
+        this.fechaCreacion = LocalDateTime.now();
+        this.usuario = usuario;
+        this.solucion = "No";
+        this.estado = "Activo";
+    }
 }
+

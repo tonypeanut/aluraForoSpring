@@ -6,6 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -20,6 +21,22 @@ public class Usuario implements UserDetails {
     private String nombre;
     private String email;
     private String password;
+    private String estado;
+    private LocalDateTime fechaCreacion;
+    private LocalDateTime fechaActualizacion;
+
+    public Usuario(){
+
+    }
+
+    public Usuario(DatosRegistrarUsuario datos){
+        this.usuario = datos.usuario();
+        this.nombre = datos.nombre();
+        this.email = datos.email();
+        this.password = datos.password();
+        this.fechaCreacion = LocalDateTime.now();
+        this.estado = "Activo";
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -54,5 +71,26 @@ public class Usuario implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public void Actualizar(DatosActualizarUsuario datos) {
+        if (datos.nombre()!=null){
+            this.nombre = datos.nombre();
+        }
+
+        if (datos.usuario()!=null){
+            this.usuario = datos.usuario();
+        }
+
+        if (datos.email()!=null){
+            this.email = datos.email();
+        }
+
+        this.fechaActualizacion = LocalDateTime.now();
+    }
+
+    public void desactivar(){
+        this.estado = "Eliminado";
+        this.fechaActualizacion = LocalDateTime.now();
     }
 }

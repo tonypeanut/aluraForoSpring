@@ -52,7 +52,7 @@ public class TokenService {
                     .verify(token);
             verifier.getSubject();
         } catch (JWTVerificationException exception){
-            throw new RuntimeException("Error verificando el token.", exception);
+            throw new JWTVerificationException("Error verificando el token.");
         }
 
         Claim idClaim = verifier.getClaim("id");

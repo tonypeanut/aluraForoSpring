@@ -6,8 +6,6 @@ import com.tonypeanut.aluraForoSpring.domain.Topico.*;
 import com.tonypeanut.aluraForoSpring.domain.Usuario.Usuario;
 import com.tonypeanut.aluraForoSpring.domain.Usuario.UsuarioRepository;
 import com.tonypeanut.aluraForoSpring.infra.errores.CursoNotFoundException;
-import com.tonypeanut.aluraForoSpring.infra.errores.IdNotFoundException;
-import com.tonypeanut.aluraForoSpring.infra.errores.TituloYMensajeDuplicadosException;
 import com.tonypeanut.aluraForoSpring.infra.errores.UsuarioNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -75,7 +73,7 @@ public class TopicoController {
         topicoService.verificarTituloAndMensajeDuplicados(datos.titulo(), datos.mensaje());
 
         //Verificamos que usuario y curso existan
-        Usuario usuario = usuarioRepository.findById(datos.autorId())
+        Usuario usuario = usuarioRepository.findByIdAndEstado(datos.autorId(), "Activo")
                 .orElseThrow(() -> new UsuarioNotFoundException("Usuario no encontrado con ID: " + datos.autorId()));
         Curso curso = cursoRepository.findById(datos.cursoId())
                 .orElseThrow(() -> new CursoNotFoundException("Curso no encontrado con ID: " + datos.cursoId()));
