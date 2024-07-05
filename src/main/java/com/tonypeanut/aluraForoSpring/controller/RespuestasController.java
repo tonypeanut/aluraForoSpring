@@ -32,6 +32,7 @@ public class RespuestasController {
 
     // Registrar Respuesta
     @PostMapping
+    @Transactional
     public ResponseEntity<DatosRespuestaRespuesta> crearRespuesta(
             @RequestBody @Valid DatosRegistroRespuesta respuesta,
             HttpServletRequest request
@@ -41,7 +42,6 @@ public class RespuestasController {
         URI url = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(nuevaRespuesta.getId()).toUri();
         return ResponseEntity.created(url).body(new DatosRespuestaRespuesta(nuevaRespuesta));
     }
-
 
 
     // Listar Respuestas
@@ -56,30 +56,32 @@ public class RespuestasController {
         return ResponseEntity.ok(respuestasPage);
     }
 
-    /*
 
     // mostrar Respuesta por Id
     @GetMapping("/{id}")
-    public ResponseEntity<Respuesta> obtenerRespuestaPorId(@PathVariable Long id) {
-        Optional<Respuesta> respuesta = respuestaService.getRespuestaPorId(id);
-        return respuesta.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<DatosRespuestaRespuesta> obtenerRespuestaPorId(
+            @PathVariable Long id) {
+        DatosRespuestaRespuesta datosRespuesta = respuestaService.getRespuestaPorId(id);
+        return ResponseEntity.ok(datosRespuesta);
     }
+
 
     // Actualizar respuesta
     @PutMapping("/{id}")
-    public ResponseEntity<Respuesta> actualizarRespuesta(@PathVariable Long id, @RequestBody Respuesta respuesta) {
-        Respuesta respuestaActualizada = respuestaService.actualizarRespuesta(id, respuesta);
-        return ResponseEntity.ok(respuestaActualizada);
+    @Transactional
+    public ResponseEntity<DatosRespuestaRespuesta> actualizarRespuesta(
+            @PathVariable String id,
+            @RequestBody @Valid DatosActualizarRespuesta datosRespuesta,
+            HttpServletRequest request) {
+        Respuesta respuesta = respuestaService.actualizarRespuesta(id, datosRespuesta, request);
+        return ResponseEntity.ok(new DatosRespuestaRespuesta(respuesta));
     }
 
     // Eliminar respuesta
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarRespuesta(@PathVariable Long id) {
-        respuestaService.eliminarRespuesta(id);
+    @Transactional
+    public ResponseEntity<Void> eliminarRespuesta(@PathVariable String id, HttpServletRequest request) {
+        respuestaService.eliminarRespuesta(id, request);
         return ResponseEntity.noContent().build();
     }
-
-
-     */
 }

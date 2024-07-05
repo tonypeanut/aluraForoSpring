@@ -2,67 +2,60 @@ package com.tonypeanut.aluraForoSpring.domain.Usuario;
 
 import com.tonypeanut.aluraForoSpring.infra.errores.*;
 import com.tonypeanut.aluraForoSpring.infra.security.TokenService;
+import com.tonypeanut.aluraForoSpring.util.UtilidadesService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
-
 @Service
 public class UsuarioService {
     @Autowired
     private UsuarioRepository usuarioRepository;
-
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
-
     @Autowired
     private TokenService tokenService;
+    @Autowired
+    private UtilidadesService utilidadesService;
 
 
-    public DatosUsuarioRespuesta crearUsuario(DatosRegistrarUsuario datos){
+    public Usuario crearUsuario(DatosRegistrarUsuario datos){
 
+        //Verificamos si ya existe el usuario en la base de datos
         if (usuarioRepository.existsByUsuario(datos.usuario())){
             throw new UsuarioDuplicadoException("El nombre de usuario ya está en uso");
         }
 
+        //Verificamos si ya existe el email en la base de datos
         if (usuarioRepository.existsByEmail(datos.email())){
             throw new CorreoDuplicadoException("El correo ya está en uso");
         }
 
+        //Codificamos la contraseña
         String passwordCodificado = passwordEncoder.encode(datos.password());
+
+        //Creamos el usuario y asignamos la contrsaseña
         var usuario = new Usuario(datos);
         usuario.setPassword(passwordCodificado);
-        var usuarioGuardado = usuarioRepository.save(usuario);
-        return new DatosUsuarioRespuesta(usuarioGuardado);
+
+
+        return usuarioRepository.save(usuario);
     }
 
-    public DatosUsuarioRespuesta mostrarUsuarioPorId(String id){
-        Long idLong;
-        var idNotFoundException = new IdNotFoundException("El Id " + id + " no existe.");
-        try{
-            idLong = Long.valueOf(id);
-        } catch (Exception e){
-            throw idNotFoundException;
-        }
+    public Usuario mostrarUsuarioPorId(String id){
+        //Verificamos que el id tenga formato válido
+        Long idLong = utilidadesService.verificarId(id);
 
-        Usuario usuario = usuarioRepository.findByIdAndEstado(idLong,"Activo")
-                .orElseThrow(() -> idNotFoundException);
-
-        return new DatosUsuarioRespuesta(usuario);
+        //retornamos el usuario de la base de datos si está activo.
+        return usuarioRepository.findByIdAndEstado(idLong,"Activo")
+                .orElseThrow(() -> new IdNotFoundException("El usuario no existe en la base de datos o fue eliminado"));
     }
 
-    public DatosUsuarioRespuesta actualizarUsuario(String id, DatosActualizarUsuario datos, HttpServletRequest request){
-
-        //Verificamos que el id sea válido
-        Long idLong;
-        try {
-            idLong = Long.valueOf(id);
-        } catch (Exception e){
-            throw new IdNotFoundException("El Id " + id + " no existe.");
-        }
+    public Usuario actualizarUsuario(String id, DatosActualizarUsuario datos, HttpServletRequest request){
+        //Verificamos que el id tenga formato válido
+        Long idLong = utilidadesService.verificarId(id);
 
         //Verificamos que si existe el usuario no exista otro igual en la base de datos.
         if (usuarioRepository.existsByUsuarioAndIdNot(datos.usuario(), idLong)){
@@ -79,14 +72,7 @@ public class UsuarioService {
                 .orElseThrow(()-> new UsernameNotFoundException("Usuario no encontrado o no está activo"));
 
         //Verificar que el usuario coincida con el del token
-        var authHeader = request.getHeader("Authorization");
-        if(authHeader!=null){
-            var token = authHeader.replace("Bearer ", "");
-            var idToken = tokenService.getId(token);
-            if(!Objects.equals(usuario.getId(), idToken)){
-                throw new UnauthorizedException("No estas autorizado para realizar esta actualización");
-            }
-        }
+        tokenService.verificarAutor(request, usuario.getId());
 
         //Verificamos que la contraseña sea correcta
         if(!passwordEncoder.matches(datos.password(), usuario.getPassword())){
@@ -106,42 +92,15 @@ public class UsuarioService {
 
         //Actualizamos los datos y guardamos
         usuario.Actualizar(datos);
-        Usuario usuarioActualizado = usuarioRepository.save(usuario);
-
-        return new DatosUsuarioRespuesta(usuarioActualizado);
+        return usuarioRepository.save(usuario);
     }
 
     public void eliminarUsuario(String id, HttpServletRequest request){
-        //Verificamos que el id sea válido
-        Long idLong;
-        try {
-            idLong = Long.valueOf(id);
-        } catch (Exception e){
-            throw new IdNotFoundException("El Id " + id + " no existe.");
-        }
+        //Verificamos que el id tenga formato válido
+        Long idLong = utilidadesService.verificarId(id);
 
-        // Obtener el token del encabezado Authorization
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new UnauthorizedException("Token no presente o mal formado.");
-        }
-
-        //Obtenemos el id del token
-        var token = authHeader.replace("Bearer ", "");
-        Long idToken = tokenService.getId(token);
-
-        //Validamos el id del path
-        Long idPath;
-        try{
-            idPath = Long.valueOf(id);
-        } catch (Exception e){
-            throw new IdNotFoundException("Id no válido");
-        }
-
-        //Comparamos id del token con el path
-        if(!idToken.equals(idPath)){
-            throw new UnauthorizedException("No estas autorizado para realizar esta actualización");
-        }
+        //Validamos que el usuario sea quien desea eliminar el usuario
+        tokenService.verificarAutor(request, idLong);
 
         // Verificar si el usuario existe
         Usuario usuario = usuarioRepository.findByIdAndEstado(idLong, "Activo")

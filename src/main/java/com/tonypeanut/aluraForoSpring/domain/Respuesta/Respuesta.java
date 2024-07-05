@@ -19,6 +19,7 @@ public class Respuesta {
     @JoinColumn(name = "respuestas_topicos_id")
     private Topico topico;
     private LocalDateTime fechaCreacion;
+    private LocalDateTime fechaActualizacion;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "respuestas_usuarios_id")
     private Usuario usuario;
@@ -38,6 +39,23 @@ public class Respuesta {
         this.usuario = usuario;
         this.solucion = "No";
         this.estado = "Activo";
+    }
+
+    public void actualizar(DatosActualizarRespuesta datos){
+        if(datos.mensaje()!=null){
+            this.mensaje = datos.mensaje();
+        }
+
+        if(datos.solucion() != null && datos.solucion().equals("Solucionado")){
+            this.solucion = "Solucionado";
+        }
+
+        this.fechaActualizacion = LocalDateTime.now();
+    }
+
+    public void desactivar(){
+        this.estado = "Eliminado";
+        this.fechaActualizacion = LocalDateTime.now();
     }
 }
 

@@ -8,6 +8,7 @@ public record DatosRespuestaRespuesta(
         Long topicoId,
         String mensaje,
         LocalDateTime fechaCreacion,
+        LocalDateTime fechaActualizacion,
         String solucion,
         Long usuarioId
 ) {
@@ -16,6 +17,7 @@ public record DatosRespuestaRespuesta(
                 respuesta.getTopico().getId(),
                 respuesta.getMensaje(),
                 respuesta.getFechaCreacion(),
+                respuesta.getFechaActualizacion(),
                 respuesta.getSolucion(),
                 respuesta.getUsuario().getId()
         );

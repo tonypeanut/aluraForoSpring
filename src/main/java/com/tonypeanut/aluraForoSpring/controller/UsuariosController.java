@@ -18,17 +18,15 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/usuarios")
 public class UsuariosController {
-
     @Autowired
     UsuarioService usuarioService;
-
     @Autowired
     UsuarioRepository usuarioRepository;
 
     //Registrar usuario
     @PostMapping("/registrar")
     public ResponseEntity<DatosUsuarioRespuesta> registrarUsuario(@RequestBody @Valid DatosRegistrarUsuario datos) {
-        DatosUsuarioRespuesta datosUsuarioRespuesta = usuarioService.crearUsuario(datos);
+        DatosUsuarioRespuesta datosUsuarioRespuesta = new DatosUsuarioRespuesta(usuarioService.crearUsuario(datos));
         return ResponseEntity.status(HttpStatus.CREATED).body(datosUsuarioRespuesta);
     }
 
@@ -45,7 +43,7 @@ public class UsuariosController {
     //Obtener usuario por id
     @GetMapping("/{id}")
     public ResponseEntity<DatosUsuarioRespuesta> mostrarUsuarioPorId(@PathVariable String id) {
-        var respuesta = usuarioService.mostrarUsuarioPorId(id);
+        DatosUsuarioRespuesta respuesta = new DatosUsuarioRespuesta(usuarioService.mostrarUsuarioPorId(id));
         return ResponseEntity.ok(respuesta);
     }
 
@@ -56,7 +54,7 @@ public class UsuariosController {
             @PathVariable String id,
             @RequestBody @Valid DatosActualizarUsuario datos,
             HttpServletRequest request) {
-        var respuesta = usuarioService.actualizarUsuario(id, datos, request);
+        DatosUsuarioRespuesta respuesta =new DatosUsuarioRespuesta(usuarioService.actualizarUsuario(id, datos, request));
         return ResponseEntity.ok(respuesta);
     }
 
