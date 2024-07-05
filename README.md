@@ -39,30 +39,9 @@
     mvn spring-boot:run
 
 Uso
-Endpoints Principales
+Para visualizar la ocumentacion y endpoints una vez ejecutada la aplicación accede a la ruta: 
 
-    Crear un nuevo tópico:
-        POST /topicos
-        Body: { "titulo": "Nuevo Tópico", "mensaje": "Contenido del tópico", "autorId": "ID del Usuario", "cursoId": "ID del curso" }
-
-    Mostrar todos los tópicos:
-        GET /topicos
-        Parametros opcionales: "nombreCurso", "year"
-        Ejemplo: /topicos?nombreCurso=1&year=2024
-
-    Mostrar un tópico específico:
-        GET /topicos/{id}
-
-    Actualizar un tópico:
-        PUT /topicos/{id}
-        Body: { "titulo": "Título Actualizado", "mensaje": "Contenido Actualizado" }
-
-    Eliminar un tópico:
-        DELETE /topicos/{id}
-
-    Generar JWT token:
-        POST /login
-        Body: { "login": "Usuario", "clave": "Contraseña" }
+   http://localhost:8080/swagger-ui/index.html
 
 Autenticación
 
